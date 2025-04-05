@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ricky Browser</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="browser-tools">
+      <div id="button-container">
+        <button id="back-button" title="Back">&#8592;</button>
+        <button id="forward-button" title="Forward">&#8594;</button>
+        <button id="reload-button" title="Reload">&#x21BB;</button>
+        <button id="search-button" title="Search"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg></button>
+        <button id="new-window-button" title="New Window">&#43;</button>
+      </div>
+      <form>
+        <input id="url-input" type="text" placeholder="Enter website Url staring with www." required>
+      </form>
+      <button id="go">Go</button> 
+    </div>
+    <webview id="webview"></webview>
+    <script type="module" src="/src/renderer.js"></script>
+  </body>
+</html>
