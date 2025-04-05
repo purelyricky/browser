@@ -13,7 +13,7 @@ const createWindow = () => {
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    icon: path.join(__dirname, 'icon.ico'),
+    icon: path.join(__dirname, '../public/icon.ico'),  // Updated icon path
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
