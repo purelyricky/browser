@@ -16,6 +16,26 @@ const urlInputField = document.getElementById('url-input');
 const webview = document.getElementById('webview');
 let url = "";
 
+// Add click-through mode toggle
+document.addEventListener('keydown', (event) => {
+  // Check for Ctrl+Alt+C keyboard shortcut
+  if (event.ctrlKey && event.altKey && event.key === 'c') {
+    api.toggleClickThrough();
+  }
+});
+
+// Add listener for click-through status updates
+window.api.receive && window.api.receive('click-through-status', (isClickThrough) => {
+  const indicator = document.getElementById('click-through-indicator');
+  if (indicator) {
+    if (isClickThrough) {
+      indicator.classList.add('active');
+    } else {
+      indicator.classList.remove('active');
+    }
+  }
+});
+
 urlInputField.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     event.preventDefault();
