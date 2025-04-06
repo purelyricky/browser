@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 
@@ -7,20 +7,75 @@ if (started) {
   app.quit();
 }
 
+function registerShortcuts(mainWindow) {
+  // Move window shortcuts
+  globalShortcut.register('Control+Up', () => {
+    const [x, y] = mainWindow.getPosition();
+    mainWindow.setPosition(x, y - 20);
+  });
+  
+  globalShortcut.register('Control+Down', () => {
+    const [x, y] = mainWindow.getPosition();
+    mainWindow.setPosition(x, y + 20);
+  });
+  
+  globalShortcut.register('Control+Left', () => {
+    const [x, y] = mainWindow.getPosition();
+    mainWindow.setPosition(x - 20, y);
+  });
+  
+  globalShortcut.register('Control+Right', () => {
+    const [x, y] = mainWindow.getPosition();
+    mainWindow.setPosition(x + 20, y);
+  });
+  
+  // Toggle visibility shortcut
+  globalShortcut.register('Control+Alt+H', () => {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
+  });
+  
+  // Translucency control
+  globalShortcut.register('Control+Alt+=', () => {
+    const currentOpacity = mainWindow.getOpacity();
+    if (currentOpacity < 1.0) {
+      mainWindow.setOpacity(Math.min(1, currentOpacity + 0.1));
+    }
+  });
+  
+  globalShortcut.register('Control+Alt+-', () => {
+    const currentOpacity = mainWindow.getOpacity();
+    if (currentOpacity > 0.1) {
+      mainWindow.setOpacity(Math.max(0.1, currentOpacity - 0.1));
+    }
+  });
+}
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     autoHideMenuBar: true,
-    icon: path.join(__dirname, '../public/icon.ico'),  // Updated icon path
+    icon: path.join(__dirname, '../public/icon.ico'),
+    resizable: true,  // Ensure window is resizable
+    frame: true,      // Keep window frame for resizing
+    backgroundColor: '#ffffff',  // Set background color instead of transparency
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
     },
   });
 
+  // Set initial opacity
+  mainWindow.setOpacity(0.7);
   mainWindow.setAlwaysOnTop(true, 'screen');
+
+  // Register keyboard shortcuts
+  registerShortcuts(mainWindow);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -28,19 +83,12 @@ const createWindow = () => {
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
-
-  // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
   createWindow();
 
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -48,17 +96,15 @@ app.whenReady().then(() => {
   });
 });
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Clean up shortcuts when app is quitting
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-
-ipcMain.on('new-window', createWindow) 
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+ipcMain.on('new-window', createWindow);
